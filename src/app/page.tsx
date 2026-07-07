@@ -69,7 +69,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-4 gap-4 mb-6">
-        {stats.map((s) => (
+        {stats.map((s: { label: string; value: number; color: string; icon: string }) => (
           <div key={s.label} className="stat-card">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wide">{s.label}</span>
@@ -88,7 +88,7 @@ export default async function DashboardPage() {
         <div className="content-card p-5">
           <h3 className="text-sm font-semibold mb-4">工单状态分布</h3>
           <div className="space-y-2.5">
-            {ticketStatusCounts.map((t) => (
+            {ticketStatusCounts.map((t: { status: string; _count: number }) => (
               <div key={t.status} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full" style={{ background: statusColors[t.status] || "var(--color-text-secondary)" }} />
@@ -182,7 +182,7 @@ export default async function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {recentSyncLogs.map((log) => (
+              {recentSyncLogs.map((log: { id: string; requestId: string; apiName: string; isSuccess: boolean; durationMs: number | null; createdAt: Date }) => (
                 <tr key={log.id} className="table-row">
                   <td className="table-cell font-mono text-xs">{log.requestId.slice(0, 16)}...</td>
                   <td className="table-cell">{log.apiName}</td>
