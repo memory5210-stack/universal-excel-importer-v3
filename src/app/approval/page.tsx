@@ -43,6 +43,7 @@ interface TicketItem {
   amount: number
   description: string
   createdAt: string
+  updatedAt: string
   reporter: { name: string }
 }
 
@@ -78,19 +79,23 @@ export default function ApprovalPage() {
   async function handleApproval() {
     if (!actionTicket) return
     setSubmitting(true)
+    const currentTicket = tickets.find((t) => t.id === actionTicket.id)
+    const approvalLevel = currentTicket?.status === "approval_l2" ? "l2" : "l1"
+    const updatedAt = currentTicket?.updatedAt ?? null
     try {
-      const res = await fetch("/api/approval", {
+      const res = await fetch(`/api/tickets/${actionTicket.id}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ticketId: actionTicket.id,
           action: actionTicket.action,
           comment,
+          approvalLevel,
+          updatedAt,
         }),
       })
       const data = await res.json()
       if (res.ok) {
-        showToast(data.message || (actionTicket.action === "approved" ? "审批通过" : "已驳回"), "success")
+        showToast(data.transition?.message || (actionTicket.action === "approved" ? "审批通过" : "已驳回"), "success")
         setActionTicket(null)
         setComment("")
         fetchTickets()

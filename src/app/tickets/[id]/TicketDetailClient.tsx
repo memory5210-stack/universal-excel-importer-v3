@@ -10,9 +10,11 @@ interface Props {
   status: string
   amount: number
   isEligibleApprover: boolean
+  approvalLevel: string
+  updatedAt: string
 }
 
-export function TicketDetailClient({ ticketId, status, amount, isEligibleApprover }: Props) {
+export function TicketDetailClient({ ticketId, status, amount, isEligibleApprover, approvalLevel, updatedAt }: Props) {
   const router = useRouter()
   const { showToast } = useToast()
   const [action, setAction] = useState<"approved" | "rejected" | null>(null)
@@ -24,14 +26,14 @@ export function TicketDetailClient({ ticketId, status, amount, isEligibleApprove
     if (!action) return
     setSubmitting(true)
     try {
-      const res = await fetch("/api/approval", {
+      const res = await fetch(`/api/tickets/${ticketId}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ticketId, action, comment }),
+        body: JSON.stringify({ action, comment, approvalLevel, updatedAt }),
       })
       const data = await res.json()
       if (res.ok) {
-        showToast(data.message || "操作成功", "success")
+        showToast(data.transition?.message || "操作成功", "success")
         router.refresh()
       } else {
         showToast(data.error || "操作失败", "error")

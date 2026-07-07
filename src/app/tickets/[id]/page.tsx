@@ -86,9 +86,12 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
   const skuSummary = waybillSnapshot ? JSON.parse(waybillSnapshot.skuSummary || "[]") as Array<{ skuCode: string; skuName: string; quantity: number }> : []
 
   const isEligibleApprover =
-    (ticket.status === "pending_approval" || ticket.status === "approval_l1") &&
-    (user.role === "approver_l1" || user.role === "admin") ||
-    (ticket.status === "approval_l2" && (user.role === "approver_l2" || user.role === "admin"))
+    (user.role === "admin") ||
+    ((ticket.status === "pending_approval" || ticket.status === "approval_l1") &&
+      user.role === "approver_l1") ||
+    (ticket.status === "approval_l2" && user.role === "approver_l2")
+
+  const approvalLevel = ticket.status === "approval_l2" ? "l2" : "l1"
 
   return (
     <div>
@@ -103,7 +106,7 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
             上报人: {ticket.reporter.name} | {new Date(ticket.createdAt).toLocaleString("zh-CN")}
           </p>
         </div>
-        <TicketDetailClient ticketId={ticket.id} status={ticket.status} amount={ticket.amount} isEligibleApprover={isEligibleApprover} />
+        <TicketDetailClient ticketId={ticket.id} status={ticket.status} amount={ticket.amount} isEligibleApprover={isEligibleApprover} approvalLevel={approvalLevel} updatedAt={ticket.updatedAt.toISOString()} />
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-6">

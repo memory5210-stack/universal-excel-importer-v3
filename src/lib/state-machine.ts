@@ -162,10 +162,16 @@ export async function checkAndHandleTimeout() {
 
   const qcHoldCutoff = new Date(now.getTime() - thresholds.qcHoldTimeout * 60 * 1000);
   const expiredQcHolds = await prisma.scanRecord.findMany({
-    where: { batchStatus: "qc_hold", holdExpiresAt: { lt: now }, ticketId: null },
+    where: { batchStatus: "qc_hold", updatedAt: { lt: qcHoldCutoff }, batchLocked: true },
   });
 
   for (const record of expiredQcHolds) {
-    await prisma.scanRecord.update({ where: { id: record.id }, data: { batchStatus: "qc_hold" } });
+    await prisma.scanRecord.update({
+      where: { id: record.id },
+      data: {
+        batchStatus: "qc_hold",
+        batchLocked: false,
+      },
+    });
   }
 }

@@ -15,13 +15,11 @@ interface ScanResult {
     holdExpiresAt: string | null
     qcRuleDetail: string | null
   }
-  ticket: {
-    id: string
-    ticketNo: string
-    exceptionType: string
-    status: string
-  } | null
-  isDuplicateBatch: boolean
+  ticketId: string | null
+  qcResult: string
+  batchStatus: string
+  batchLocked: boolean
+  warning?: string
 }
 
 export default function ScanPage() {
@@ -189,9 +187,9 @@ export default function ScanPage() {
                 <div className="text-xs">{result.scanRecord.qcDescription || "-"}</div>
               </div>
 
-              {result.isDuplicateBatch && (
+              {result.warning && (
                 <div className="p-3 rounded-lg text-sm" style={{ background: "#FEF3C7", color: "#92400E" }}>
-                  该批次已存在未关闭品控工单
+                  {result.warning}
                 </div>
               )}
 
@@ -204,13 +202,10 @@ export default function ScanPage() {
                 </div>
               )}
 
-              {result.ticket && (
+              {result.ticketId && (
                 <div className="p-3 rounded-lg" style={{ background: "var(--color-primary-light)" }}>
                   <div className="text-xs text-[var(--color-text-secondary)] mb-1">自动创建工单</div>
-                  <div className="text-sm font-medium">{result.ticket.ticketNo}</div>
-                  <div className="text-xs mt-1">
-                    <span className={`status-badge ${result.ticket.status}`}>{result.ticket.status}</span>
-                  </div>
+                  <div className="text-sm font-medium">{result.ticketId.slice(0, 8)}...</div>
                 </div>
               )}
 
