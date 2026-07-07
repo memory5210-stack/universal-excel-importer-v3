@@ -1,0 +1,164 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  name      String
+  role      String   // admin, qc_supervisor, approver_l1, approver_l2, reporter
+  email     String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  scanRecords      ScanRecord[]
+  approvalRecords  ApprovalRecord[]
+  reportedTickets  ExceptionTicket[] @relation("Reporter")
+  approvedTickets  ExceptionTicket[] @relation("CurrentApprover")
+}
+
+model WaybillSnapshot {
+  id          String   @id @default(uuid())
+  waybillNo   String   @unique
+  senderInfo  String   // JSON
+  receiverInfo String  // JSON
+  totalAmount Float
+  skuSummary  String   // JSON array
+  syncSource  String   // "realtime" or "batch"
+  syncedAt    DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  exceptionTickets ExceptionTicket[]
+}
+
+model SyncLog {
+  id             String   @id @default(uuid())
+  requestId      String   @unique
+  apiName        String
+  requestParams  String   // JSON
+  responseStatus Int?
+  responseBody   String?
+  isSuccess      Boolean
+  errorMessage   String?
+  durationMs     Int?
+  createdAt      DateTime @default(now())
+}
+
+model ExceptionTicket {
+  id                 String   @id @default(uuid())
+  ticketNo           String   @unique
+  ticketSource       String   // "scan_auto" or "manual_report"
+  exceptionType      String
+  severity           String   // "low", "medium", "high", "critical"
+  description        String
+  status             String   // "pending_approval","approval_l1","approval_l2","executing","completed","rejected","auto_rejected"
+  rejectCount        Int      @default(0)
+  amount             Float    @default(0)
+  waybillSnapshotId  String?
+  reporterId         String
+  currentApproverId  String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  waybillSnapshot    WaybillSnapshot?  @relation(fields: [waybillSnapshotId], references: [id])
+  reporter           User              @relation("Reporter", fields: [reporterId], references: [id])
+  currentApprover    User?             @relation("CurrentApprover", fields: [currentApproverId], references: [id])
+  approvalRecords    ApprovalRecord[]
+  compensationRecords CompensationRecord[]
+  inventoryRecords   InventoryRecord[]
+  scanRecords        ScanRecord[]
+}
+
+model ScanRecord {
+  id            String    @id @default(uuid())
+  waybillNo     String
+  skuCode       String
+  scanTime      DateTime  @default(now())
+  operatorId    String
+  qcResult      String    // "pass", "exception"
+  qcDescription String?
+  batchLocked   Boolean   @default(false)
+  qcRuleId      String?
+  qcRuleDetail  String?   // JSON
+  ticketId      String?
+  batchStatus   String    // "scanning","qc_hold","normal_outbound","quick_release"
+  holdExpiresAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  operator User              @relation(fields: [operatorId], references: [id])
+  ticket   ExceptionTicket?  @relation(fields: [ticketId], references: [id])
+  qcRule   QcRule?           @relation(fields: [qcRuleId], references: [id])
+}
+
+model QcRule {
+  id                String   @id @default(uuid())
+  ruleName          String
+  exceptionSubType  String
+  triggerCondition  String   // JSON
+  severityLevel     String
+  autoCreateTicket  Boolean  @default(true)
+  autoApprovalLevel String?
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  scanRecords ScanRecord[]
+}
+
+model ApprovalRecord {
+  id            String   @id @default(uuid())
+  ticketId      String
+  approverId    String
+  approvalLevel String   // "l1", "l2"
+  action        String   // "approved", "rejected"
+  comment       String?
+  createdAt     DateTime @default(now())
+
+  ticket   ExceptionTicket @relation(fields: [ticketId], references: [id])
+  approver User            @relation(fields: [approverId], references: [id])
+  compensationRecords CompensationRecord[]
+}
+
+model CompensationRecord {
+  id               String   @id @default(uuid())
+  ticketId         String
+  approvalRecordId String?
+  amount           Float
+  direction        String   // "to_customer" or "from_supplier"
+  status           String   // "pending", "completed"
+  description      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  ticket         ExceptionTicket @relation(fields: [ticketId], references: [id])
+  approvalRecord ApprovalRecord? @relation(fields: [approvalRecordId], references: [id])
+}
+
+model InventoryRecord {
+  id          String   @id @default(uuid())
+  ticketId    String
+  skuCode     String
+  changeType  String   // "outbound","inbound","return","write_off"
+  quantity    Int
+  description String?
+  createdAt   DateTime @default(now())
+
+  ticket ExceptionTicket @relation(fields: [ticketId], references: [id])
+}
+
+model ConfigRule {
+  id          String   @id @default(uuid())
+  ruleKey     String   @unique
+  ruleValue   String   // JSON
+  description String?
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+}
