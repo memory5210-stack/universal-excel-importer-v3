@@ -1,18 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaLibSql } from "@prisma/adapter-libsql";
-import path from "path";
+import { PrismaNeon } from "@prisma/adapter-neon";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const rawUrl = process.env.DATABASE_URL || "file:./dev.db";
-const match = rawUrl.match(/^file:(.+)$/);
-const dbPath = match
-  ? `file:${path.resolve(process.cwd(), match[1])}`
-  : rawUrl;
-
-const adapter = new PrismaLibSql({ url: dbPath });
+const connectionString = process.env.DATABASE_URL || "";
+const adapter = new PrismaNeon({ connectionString });
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 

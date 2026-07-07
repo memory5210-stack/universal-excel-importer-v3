@@ -36,7 +36,6 @@ async function logSync(entry: SyncLogEntry): Promise<void> {
       },
     });
   } catch {
-    // Log failure is non-critical
   }
 }
 

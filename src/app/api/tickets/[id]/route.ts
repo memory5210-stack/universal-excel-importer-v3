@@ -12,13 +12,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         waybillSnapshot: true,
         reporter: true,
         currentApprover: true,
-        approvalRecords: {
-          include: { approver: true },
-          orderBy: { createdAt: "desc" },
-        },
+        approvalRecords: { include: { approver: true }, orderBy: { createdAt: "desc" } },
         compensationRecords: true,
         inventoryRecords: true,
-        scanRecords: true,
+        scanRecords: { include: { operator: true } },
       },
     });
     if (!ticket) {

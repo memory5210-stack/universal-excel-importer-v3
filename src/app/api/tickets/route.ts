@@ -10,32 +10,32 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get("pageSize") || "20")));
-    const status = searchParams.get("status");
-    const exceptionType = searchParams.get("exceptionType");
-    const waybillNo = searchParams.get("waybillNo");
-    const ticketSource = searchParams.get("ticketSource");
+    const status = searchParams.get("status") || undefined;
+    const exceptionType = searchParams.get("exceptionType") || undefined;
+    const waybillNo = searchParams.get("waybillNo") || undefined;
+    const ticketSource = searchParams.get("ticketSource") || undefined;
 
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     if (status) where.status = status;
     if (exceptionType) where.exceptionType = exceptionType;
-    if (waybillNo) {
-      where.waybillSnapshot = { waybillNo: { contains: waybillNo } };
-    }
     if (ticketSource) where.ticketSource = ticketSource;
+    if (waybillNo) {
+      where.waybillSnapshot = { waybillNo };
+    }
 
-    const [total, tickets] = await Promise.all([
-      prisma.exceptionTicket.count({ where }),
+    const [tickets, total] = await Promise.all([
       prisma.exceptionTicket.findMany({
         where,
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-        orderBy: { createdAt: "desc" },
         include: {
           waybillSnapshot: true,
-          reporter: true,
-          currentApprover: true,
+          reporter: { select: { id: true, name: true } },
+          currentApprover: { select: { id: true, name: true } },
         },
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
       }),
+      prisma.exceptionTicket.count({ where }),
     ]);
 
     return NextResponse.json({ tickets, total, page, pageSize });
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       where: {
         waybillSnapshotId: waybillSnapshot.id,
         exceptionType,
-        status: { in: ["pending_approval", "approval_l1", "approval_l2", "executing"] },
+        status: { notIn: ["completed", "auto_rejected"] },
       },
     });
     if (existingTicket) {
@@ -100,11 +100,6 @@ export async function POST(request: NextRequest) {
         amount: amount || 0,
         waybillSnapshotId: waybillSnapshot.id,
         reporterId: user.id,
-      },
-      include: {
-        waybillSnapshot: true,
-        reporter: true,
-        currentApprover: true,
       },
     });
 

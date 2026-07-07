@@ -19,7 +19,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: "无效的审批级别" }, { status: 400 });
     }
 
-    const ticket = await prisma.exceptionTicket.findUnique({ where: { id } });
+    const ticket = await prisma.exceptionTicket.findUnique({
+      where: { id },
+      include: {
+        waybillSnapshot: true,
+        reporter: true,
+        currentApprover: true,
+      },
+    });
+
     if (!ticket) {
       return NextResponse.json({ error: "工单不存在" }, { status: 404 });
     }
@@ -54,15 +62,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         waybillSnapshot: true,
         reporter: true,
         currentApprover: true,
-        approvalRecords: {
-          include: { approver: true },
-          orderBy: { createdAt: "desc" },
-        },
+        approvalRecords: { include: { approver: true }, orderBy: { createdAt: "desc" } },
+        compensationRecords: true,
+        inventoryRecords: true,
       },
     });
 
     return NextResponse.json({ ticket: updatedTicket, transition, approvalRecord: record });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "审批操作失败" }, { status: 500 });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "审批操作失败";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

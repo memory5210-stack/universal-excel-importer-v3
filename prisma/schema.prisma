@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {
@@ -11,7 +11,7 @@ model User {
   username  String   @unique
   password  String
   name      String
-  role      String   // admin, qc_supervisor, approver_l1, approver_l2, reporter
+  role      String
   email     String?
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -26,11 +26,11 @@ model User {
 model WaybillSnapshot {
   id          String   @id @default(uuid())
   waybillNo   String   @unique
-  senderInfo  String   // JSON
-  receiverInfo String  // JSON
+  senderInfo  String
+  receiverInfo String
   totalAmount Float
-  skuSummary  String   // JSON array
-  syncSource  String   // "realtime" or "batch"
+  skuSummary  String
+  syncSource  String
   syncedAt    DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -42,7 +42,7 @@ model SyncLog {
   id             String   @id @default(uuid())
   requestId      String   @unique
   apiName        String
-  requestParams  String   // JSON
+  requestParams  String
   responseStatus Int?
   responseBody   String?
   isSuccess      Boolean
@@ -54,11 +54,11 @@ model SyncLog {
 model ExceptionTicket {
   id                 String   @id @default(uuid())
   ticketNo           String   @unique
-  ticketSource       String   // "scan_auto" or "manual_report"
+  ticketSource       String
   exceptionType      String
-  severity           String   // "low", "medium", "high", "critical"
+  severity           String
   description        String
-  status             String   // "pending_approval","approval_l1","approval_l2","executing","completed","rejected","auto_rejected"
+  status             String
   rejectCount        Int      @default(0)
   amount             Float    @default(0)
   waybillSnapshotId  String?
@@ -82,13 +82,13 @@ model ScanRecord {
   skuCode       String
   scanTime      DateTime  @default(now())
   operatorId    String
-  qcResult      String    // "pass", "exception"
+  qcResult      String
   qcDescription String?
   batchLocked   Boolean   @default(false)
   qcRuleId      String?
-  qcRuleDetail  String?   // JSON
+  qcRuleDetail  String?
   ticketId      String?
-  batchStatus   String    // "scanning","qc_hold","normal_outbound","quick_release"
+  batchStatus   String
   holdExpiresAt DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -102,7 +102,7 @@ model QcRule {
   id                String   @id @default(uuid())
   ruleName          String
   exceptionSubType  String
-  triggerCondition  String   // JSON
+  triggerCondition  String
   severityLevel     String
   autoCreateTicket  Boolean  @default(true)
   autoApprovalLevel String?
@@ -117,8 +117,8 @@ model ApprovalRecord {
   id            String   @id @default(uuid())
   ticketId      String
   approverId    String
-  approvalLevel String   // "l1", "l2"
-  action        String   // "approved", "rejected"
+  approvalLevel String
+  action        String
   comment       String?
   createdAt     DateTime @default(now())
 
@@ -132,8 +132,8 @@ model CompensationRecord {
   ticketId         String
   approvalRecordId String?
   amount           Float
-  direction        String   // "to_customer" or "from_supplier"
-  status           String   // "pending", "completed"
+  direction        String
+  status           String
   description      String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -146,7 +146,7 @@ model InventoryRecord {
   id          String   @id @default(uuid())
   ticketId    String
   skuCode     String
-  changeType  String   // "outbound","inbound","return","write_off"
+  changeType  String
   quantity    Int
   description String?
   createdAt   DateTime @default(now())
@@ -157,7 +157,7 @@ model InventoryRecord {
 model ConfigRule {
   id          String   @id @default(uuid())
   ruleKey     String   @unique
-  ruleValue   String   // JSON
+  ruleValue   String
   description String?
   updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())

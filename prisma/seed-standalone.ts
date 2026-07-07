@@ -1,10 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaLibSql } from "@prisma/adapter-libsql";
+import { PrismaNeon } from "@prisma/adapter-neon";
 
-const adapter = new PrismaLibSql({
-  url: process.env.DATABASE_URL || "file:./dev.db",
-});
-
+const connectionString = process.env.DATABASE_URL || "postgresql://localhost:5432/postgres";
+const adapter = new PrismaNeon({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 async function hashPassword(password: string): Promise<string> {
