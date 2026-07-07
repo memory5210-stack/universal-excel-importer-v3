@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    allowedHosts: [".monkeycode-ai.online"],
-  },
+  /* config options here */
 };
 
 export default nextConfig;
