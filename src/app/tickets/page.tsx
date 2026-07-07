@@ -121,8 +121,8 @@ export default function TicketsPage() {
             <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">工单状态</label>
             <select className="select-field text-sm" value={filters.status} onChange={(e) => handleFilterChange("status", e.target.value)}>
               <option value="">全部状态</option>
-              {Object.entries(statusLabels).map(([k, v]) => (
-                <option key={k} value={k}>{v}</option>
+              {Object.entries(statusLabels).map(([k, v]: [string, unknown]) => (
+                <option key={k} value={k}>{v as string}</option>
               ))}
             </select>
           </div>
@@ -130,8 +130,8 @@ export default function TicketsPage() {
             <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">异常类型</label>
             <select className="select-field text-sm" value={filters.exceptionType} onChange={(e) => handleFilterChange("exceptionType", e.target.value)}>
               <option value="">全部类型</option>
-              {Object.entries(exceptionTypeLabels).map(([k, v]) => (
-                <option key={k} value={k}>{v}</option>
+              {Object.entries(exceptionTypeLabels).map(([k, v]: [string, unknown]) => (
+                <option key={k} value={k}>{v as string}</option>
               ))}
             </select>
           </div>
@@ -143,8 +143,8 @@ export default function TicketsPage() {
             <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">来源</label>
             <select className="select-field text-sm" value={filters.ticketSource} onChange={(e) => handleFilterChange("ticketSource", e.target.value)}>
               <option value="">全部来源</option>
-              {Object.entries(ticketSourceLabels).map(([k, v]) => (
-                <option key={k} value={k}>{v}</option>
+              {Object.entries(ticketSourceLabels).map(([k, v]: [string, unknown]) => (
+                <option key={k} value={k}>{v as string}</option>
               ))}
             </select>
           </div>
@@ -172,7 +172,7 @@ export default function TicketsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {tickets.map((t) => (
+                  {tickets.map((t: Ticket) => (
                     <tr key={t.id} className="table-row cursor-pointer" onClick={() => handleRowClick(t.id)}>
                       <td className="table-cell font-mono text-xs font-medium">{t.ticketNo}</td>
                       <td className="table-cell">

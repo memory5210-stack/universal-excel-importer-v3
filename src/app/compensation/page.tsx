@@ -94,7 +94,7 @@ export default function CompensationPage() {
                 </tr>
               </thead>
               <tbody>
-                {records.map((r) => (
+                {records.map((r: Compensation) => (
                   <tr key={r.id} className="table-row">
                     <td className="table-cell font-mono text-xs font-medium">{r.ticketNo}</td>
                     <td className="table-cell">

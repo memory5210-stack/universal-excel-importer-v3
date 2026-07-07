@@ -209,7 +209,7 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
         <div className="detail-section mb-6">
           <div className="detail-section-header">审批记录</div>
           <div className="divide-y divide-[var(--color-border)]">
-            {ticket.approvalRecords.map((record) => (
+            {ticket.approvalRecords.map((record: { id: string; action: string; approvalLevel: string; comment: string | null; createdAt: Date; approver: { name: string } }) => (
               <div key={record.id} className="p-4 flex items-start gap-4">
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style={{ background: record.action === "approved" ? "var(--color-accent-green)" : "var(--color-accent-red)" }}>
                   {record.action === "approved" ? "通" : "驳"}
@@ -248,7 +248,7 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
                 </tr>
               </thead>
               <tbody>
-                {ticket.compensationRecords.map((cr) => (
+                {ticket.compensationRecords.map((cr: { id: string; direction: string; amount: number; status: string; description: string | null; createdAt: Date }) => (
                   <tr key={cr.id} className="table-row">
                     <td className="table-cell">
                       <span className={`tag ${cr.direction === "to_customer" ? "red" : "blue"}`}>
@@ -286,7 +286,7 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
                 </tr>
               </thead>
               <tbody>
-                {ticket.inventoryRecords.map((ir) => (
+                {ticket.inventoryRecords.map((ir: { id: string; skuCode: string; changeType: string; quantity: number; description: string | null; createdAt: Date }) => (
                   <tr key={ir.id} className="table-row">
                     <td className="table-cell font-mono text-xs">{ir.skuCode}</td>
                     <td className="table-cell">
@@ -321,7 +321,7 @@ export default async function TicketDetailPage({ params }: { params: Promise<{ i
                 </tr>
               </thead>
               <tbody>
-                {ticket.scanRecords.map((sr) => (
+                {ticket.scanRecords.map((sr: { id: string; waybillNo: string; skuCode: string; qcResult: string; batchStatus: string; operator: { name: string }; scanTime: Date }) => (
                   <tr key={sr.id} className="table-row">
                     <td className="table-cell font-mono text-xs">{sr.waybillNo}</td>
                     <td className="table-cell font-mono text-xs">{sr.skuCode}</td>

@@ -124,7 +124,7 @@ export default function MonitoringPage() {
                 </tr>
               </thead>
               <tbody>
-                {logs.map((log) => (
+                {logs.map((log: SyncLog) => (
                   <tr key={log.id} className="table-row" style={{ background: log.isSuccess ? undefined : "#FEF2F2" }}>
                     <td className="table-cell font-mono text-xs">{log.requestId.slice(0, 16)}...</td>
                     <td className="table-cell font-medium text-xs">{log.apiName}</td>

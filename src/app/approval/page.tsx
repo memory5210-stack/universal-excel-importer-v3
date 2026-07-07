@@ -114,7 +114,7 @@ export default function ApprovalPage() {
       </div>
 
       <div className="flex gap-1 mb-4 border-b border-[var(--color-border)]">
-        {tabs.map((t) => (
+        {tabs.map((t: { key: string; label: string }) => (
           <button key={t.key} className={`tab-btn ${tab === t.key ? "active" : ""}`} onClick={() => setTab(t.key)}>
             {t.label}
           </button>
@@ -125,7 +125,7 @@ export default function ApprovalPage() {
         <PageLoading />
       ) : (
         <div className="space-y-3">
-          {tickets.map((t) => (
+          {tickets.map((t: TicketItem) => (
             <div key={t.id} className="content-card">
               <div className="p-4">
                 <div className="flex items-start justify-between">

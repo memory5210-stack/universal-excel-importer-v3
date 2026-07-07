@@ -60,7 +60,7 @@ async function callV2Api<T>(
   const startTime = Date.now();
 
   const url = new URL(`${V2_API_BASE}${endpoint}`);
-  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+  Object.entries(params).forEach(([k, v]: [string, unknown]) => url.searchParams.set(k, v as string));
 
   let lastError: string | null = null;
   let responseStatus: number | null = null;

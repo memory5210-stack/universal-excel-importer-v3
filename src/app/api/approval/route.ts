@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (status) {
-      statusFilter = statusFilter.filter((s) => s === status);
+      statusFilter = statusFilter.filter((s: string) => s === status);
     }
 
     const where: any = {};

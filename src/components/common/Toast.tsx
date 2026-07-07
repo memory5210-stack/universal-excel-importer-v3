@@ -25,7 +25,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     const id = ++toastId
     setToasts((prev) => [...prev, { id, message, type }])
     setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id))
+      setToasts((prev) => prev.filter((t: Toast) => t.id !== id))
     }, 3500)
   }, [])
 
@@ -33,7 +33,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={{ showToast }}>
       {children}
       <div className="toast-container">
-        {toasts.map((t) => (
+        {toasts.map((t: Toast) => (
           <div key={t.id} className={`toast ${t.type}`}>
             {t.type === "success" && (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

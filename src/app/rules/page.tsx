@@ -98,7 +98,7 @@ export default function RulesPage() {
   function parseCondition(conditionStr: string): string {
     try {
       const c = JSON.parse(conditionStr)
-      return Object.entries(c).map(([k, v]) => `${k}: ${v}`).join(", ")
+      return Object.entries(c).map(([k, v]: [string, unknown]) => `${k}: ${v}`).join(", ")
     } catch {
       return conditionStr
     }
@@ -118,7 +118,7 @@ export default function RulesPage() {
       <div className="mb-6">
         <h2 className="text-base font-semibold mb-4">品控规则 (QC Rules)</h2>
         <div className="grid grid-cols-2 gap-4">
-          {qcRules.map((rule) => (
+          {qcRules.map((rule: QcRule) => (
             <div key={rule.id} className="content-card">
               <div className="p-5">
                 <div className="flex items-start justify-between mb-3">
@@ -170,7 +170,7 @@ export default function RulesPage() {
       <div>
         <h2 className="text-base font-semibold mb-4">系统参数配置</h2>
         <div className="grid grid-cols-2 gap-4">
-          {configRules.map((cfg) => (
+          {configRules.map((cfg: ConfigRule) => (
             <div key={cfg.id} className="content-card">
               <div className="p-5">
                 <div className="flex items-start justify-between">

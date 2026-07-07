@@ -42,7 +42,7 @@ export function Sidebar({ user }: { user: SessionUser }) {
       </div>
 
       <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-        {navItems.map((item) => {
+        {navItems.map((item: { href: string; label: string; icon: string }) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
           return (
             <Link
