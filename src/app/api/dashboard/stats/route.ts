@@ -33,8 +33,8 @@ export async function GET() {
 
     return NextResponse.json({
       totalTickets,
-      byStatus: byStatus.map((s) => ({ status: s.status, count: s._count.id })),
-      byExceptionType: byExceptionType.map((e) => ({ exceptionType: e.exceptionType, count: e._count.id })),
+      byStatus: byStatus.map((s: { status: string; _count: { id: number } }) => ({ status: s.status, count: s._count.id })),
+      byExceptionType: byExceptionType.map((e: { exceptionType: string; _count: { id: number } }) => ({ exceptionType: e.exceptionType, count: e._count.id })),
       pendingApproval,
       recentSyncLogs,
     });
