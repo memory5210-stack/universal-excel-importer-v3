@@ -1,13 +1,11 @@
-import { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-let prismaClient: PrismaClient | undefined;
-
 function getPrisma(): PrismaClient {
-  if (prismaClient) return prismaClient;
+  if (globalForPrisma.prisma) return globalForPrisma.prisma;
 
   const connectionString =
     process.env.DATABASE_URL ||
@@ -18,17 +16,20 @@ function getPrisma(): PrismaClient {
   if (connectionString) {
     try {
       const { PrismaNeon } = require("@prisma/adapter-neon") as typeof import("@prisma/adapter-neon");
+      const { PrismaClient: PC } = require("@prisma/client") as typeof import("@prisma/client");
       const adapter = new PrismaNeon({ connectionString });
-      prismaClient = new PrismaClient({ adapter });
+      globalForPrisma.prisma = new PC({ adapter });
     } catch (e) {
       console.error("Failed to create Neon PrismaClient, falling back:", e);
-      prismaClient = new PrismaClient();
+      const { PrismaClient: PC } = require("@prisma/client") as typeof import("@prisma/client");
+      globalForPrisma.prisma = new PC();
     }
   } else {
-    prismaClient = new PrismaClient();
+    const { PrismaClient: PC } = require("@prisma/client") as typeof import("@prisma/client");
+    globalForPrisma.prisma = new PC();
   }
 
-  return prismaClient;
+  return globalForPrisma.prisma;
 }
 
 export const prisma = new Proxy({} as PrismaClient, {
