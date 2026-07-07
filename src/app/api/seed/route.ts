@@ -38,15 +38,16 @@ export async function POST(request: NextRequest) {
     waybills.push(wb);
   }
 
-  const [{ id: reporterId }, { id: approver1Id }, { id: approver2Id }] = await Promise.all([
-    prisma.user.findUnique({ where: { username: "reporter" }, select: { id: true } }),
-    prisma.user.findUnique({ where: { username: "approver1" }, select: { id: true } }),
-    prisma.user.findUnique({ where: { username: "approver2" }, select: { id: true } }),
-  ]);
+  const reporter = await prisma.user.findUnique({ where: { username: "reporter" }, select: { id: true } });
+  const approver1 = await prisma.user.findUnique({ where: { username: "approver1" }, select: { id: true } });
+  const approver2 = await prisma.user.findUnique({ where: { username: "approver2" }, select: { id: true } });
 
-  if (!reporterId || !approver1Id || !approver2Id) {
+  if (!reporter || !approver1 || !approver2) {
     return NextResponse.json({ error: "Users not found after creation" }, { status: 500 });
   }
+  const reporterId = reporter.id;
+  const approver1Id = approver1.id;
+  const approver2Id = approver2.id;
 
   const exceptionTypes = ["lost_delivery", "damaged", "refused", "timeout", "wrong_address", "qty_mismatch", "appearance_damage", "label_error"];
   const statuses = ["pending_approval", "approval_l1", "approval_l2", "executing", "completed", "rejected"];
